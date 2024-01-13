@@ -2,7 +2,7 @@
 **수명 주기를 인식하는 관찰 가능한 데이터 홀더 클래스**
 
 + ***수명 주기 인식***
-  + LiveData는 자신을 관찰하고 있는 Observer 에게 변경을 알려주는데, 만약 Observer 가 비활성화 상태라면 변경을 알려주지 않는다. 즉, 활성화된 Observer 에게만 변경사항을 전달한다. 이러한 이유로 LiveData를 관찰하기 위해서는 아래와 같은 코드가 사용되는데, observer() 메서드에 LifecycleOwner와 observer를 전달하는 것을 확인할 수 있다.
+  + LiveData는 자신을 관찰하고 있는 Observer 에게 변경을 알려주는데, 만약 Observer 가 비활성화 상태라면 변경을 알려주지 않는다. 즉, 활성화(***STARTED*** 혹은 ***RESUME*** 상태)된 Observer 에게만 변경사항을 전달한다. DESTROYED 된 observer 는 자동으로 해제되기 때문에 메모리 누수로 부터 안전하다. 이러한 이유로 LiveData를 관찰하기 위해서는 아래와 같은 코드가 사용되는데, observer() 메서드에 LifecycleOwner와 observer를 전달하는 것을 확인할 수 있다.
      ```kotlin
      val nameObserver = Observer<String> { newName ->
               // Update the UI, in this case, a TextView.
@@ -35,7 +35,8 @@
     ```
     Composable 함수는 LocalLifecycleOwner을 통해 자체적으로 수명주기를 인식할 수 있기때문에 LiveData를 관찰할 때 LifecycleOwner를 전달해주지 않아도 내부에서 스스로 관리를 한다. DisposableEffect 을 활용하여 Composable 처음 실행될 때 observer 를 등록하고 Composable 이 소멸될 때 해제해주고 있다.
     
-
++ ***Compose 에서 LiveData 가 필요할까?***
+  + Compose 에는 State 객체가 존재하며 MutableLiveData 처럼 State 를 확장한 MutableStateOf 가 존재한다. LiveData 는 configuration change 에서도 데이터를 보존하고 State 또한 rememberSaveable 을 사용하면 동일한 효과를 얻을 수 있다. State 는 LiveData 처럼 생명주기를 인식하지는 않지만 StateFlow 를 사용하면 collectAsStateWithLifecycle() 함수를 통해 생명주기를 인식할 수 있다. 그렇다면, Compose 의 State 와 Flow 의 StateFlow 가 존재하는데 굳이 LiveData 를 사용해야 하는 경우가 과연 있을까? 
     
 # MutableLiveData
 **LiveData 를 확장한 변경 가능한 클래스**
